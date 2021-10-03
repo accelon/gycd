@@ -1,0 +1,21 @@
+{
+  "name": "gycd",
+  "version": "1.0.0",
+  "description": "教育部國語辭典 Accelon21 版",
+  "main": "build.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://yapcheahshen@github.com/accelon/gycd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/accelon/gycd/issues"
+  },
+  "homepage": "https://github.com/accelon/gycd#readme"
+}
