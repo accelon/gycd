@@ -1,0 +1,12 @@
+﻿{
+    "name":"gycd",
+    "title": "國語辭典",
+    "maintainer": "yapcheahshen@gmail.com",
+    "license": "CC0",
+    "connect":"lit",
+    "format":"cidian",
+    "bookalias":{
+        "水滸傳":"水滸全傳"
+    },
+    "files":"gycd.off"
+}

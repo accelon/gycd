@@ -1,11 +1,13 @@
 import {readFileSync,writeFileSync} from 'fs'
 import {alphabetically0} from 'pitaka/utils'
-import pinpoint from '../pitaka/cli/pinpoint.js'
+
 //clone from https://github.com/g0v/moedict-data
 import hotfixes from './hotfix.js'
 import lit_12_quote from './lit_12_quote.js'
 import lit_6_quote from './lit_6_quote.js'
-const PinPoints={openlit:[lit_12_quote, lit_6_quote]} ;
+import lit_19_quote from './lit_14_quote.js'
+import lit_14_quote from './lit_19_quote.js'
+//const PinPoints={lit:[lit_12_quote, lit_6_quote,lit_14_quote,lit_19_quote]} ;
 
 const pua={'90ba':'𥳑'}
 const tidy=str=>str
@@ -64,10 +66,10 @@ const extractQuote=str=>{
 const entries=[];
 const markupDef=def=>{
    def=def.replace(/(也作|參見)「([^」]+)」(、「[^」]+」)*/g,(m,m1,m2,m3)=>{
-        let s=m1+'^ref['+m2+']';
+        let s=m1+'^se['+m2+']';
         if (m3) {
             s+=m3.replace(/「([^」]+)」/g,(m,m4)=>{
-                return '^ref['+m4+']';
+                return '^se['+m4+']';
             })
         }
         return s;
@@ -76,7 +78,7 @@ const markupDef=def=>{
 
    return def;
 }
-
+/*
 const getPinPoints=title=>{
     const out=[];
     for (let ptk in PinPoints) {
@@ -86,6 +88,7 @@ const getPinPoints=title=>{
     }
     return out;
 }
+*/
 const parseField=fields=>{
     let title=fields.title.replace(/\{\[....\]\}/,'●');
     //0x2780
@@ -131,7 +134,7 @@ const parseField=fields=>{
             +(examples.length?'\n':'')
             +examples.map(m=>'^eg '+m)
             +(quotes.length?'\n':'')
-            +quotes.map(m=>'^q '+m)
+            +quotes.map(m=>'^cf '+m)
             .join('\n'));
 
             if (!types[D.type]) types[D.type]=0;
@@ -173,7 +176,7 @@ entries.forEach(([title,en,words_defs])=>{
         } else {
             defs=defs.join('\n').split('\n');
         }
-
+/*
         const pp=getPinPoints(title);
         if (pp.length) {        
             for (let i=0;i<pp.length;i++) {
@@ -198,7 +201,7 @@ entries.forEach(([title,en,words_defs])=>{
                 pp[i]=null;
             }
         }
-
+*/
 
         entry.push(...defs);
         prevc=title;
@@ -209,4 +212,4 @@ entries.forEach(([title,en,words_defs])=>{
 
 // console.log(`max pronounce ${maxproncount} max def count ${maxdefcount}`)
 // console.log(types)
-writeFileSync('gycd.off',out.join('\n'),'utf8')
+writeFileSync('gycd.test',out.join('\n'),'utf8')
