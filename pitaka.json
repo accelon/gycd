@@ -1,12 +1,11 @@
 ﻿{
     "name":"gycd",
     "title": "國語辭典",
-    "maintainer": "yapcheahshen@gmail.com",
+    "description":"由台灣地區教育部門所編纂的辭典",
     "license": "CC0",
-    "connect":"lit",
-    "format":"cidian",
-    "bookalias":{
-        "水滸傳":"水滸全傳"
-    },
-    "files":"gycd.off"
+    "lang":"zh",
+    "lemma":"lemma.txt",
+    "template":"cidian",
+    "homepage":"https://github.com/accelon/gycd",
+    "files":"gycd-main.off"
 }
