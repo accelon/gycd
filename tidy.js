@@ -7,9 +7,11 @@ to raw/dict-revised*.txt in utf-8 format
 */
 
 import {nodefs,writeChanged,readTextLines} from 'pitaka/cli';
+import {fromDIF} from 'pitaka/format'
 await nodefs;
 import PUA from './src/pua.js';
-const raw=[];
+let raw=[];
+const srcfn=process.argv[2]|| 'dict-revised.txt'
 readTextLines('raw/sym.txt').forEach(line=>{
 	const at=line.indexOf(' ');
 	if (at==-1) return;
@@ -17,14 +19,15 @@ readTextLines('raw/sym.txt').forEach(line=>{
 	const repl=line.slice(at+1);
 	PUA[code]=repl;
 });
-
+/*
 for (let i=1;i<4;i++) {
-	const rawlines=readTextLines('raw/dict-revised'+i+'.txt');
+	const rawlines=readTextLines('raw/'+srcfile);
 	if (rawlines[0].slice(0,4)=='字詞屬性') rawlines.shift();//去欄名列
 	raw.push(...  rawlines) ;
 }
-// raw.push(...readTextLines('raw/dict-sample.txt'));
-
+*/
+ raw=readTextLines('raw/'+srcfn);
+/*
 const fixMultiline=raw=>{
 	const out=[];
 	let linedata='';
@@ -41,8 +44,10 @@ const fixMultiline=raw=>{
 	out.push(linedata);
 	return out;
 }
+*/
 
-const entries=fixMultiline(raw);
+
+const entries=fromDIF(raw);
 
 const defPUA=cp=>{
 	if ((cp[0]=='2' && cp.length==5) || (cp[0]=='3'&&cp.length==4)) {
@@ -69,17 +74,15 @@ const tidy=buf=>{
 	return buf;
 }
 
-let content=tidy(entries.join('\n'));
+entries.shift();
 
-const validate=buf=>{
-	const lines=buf.split('\n');
-	for (let i=0;i<lines.length;i++){
-		const count=lines[i].split('\t').length;
-		if (count!==14) console.log('line items error',count,i,lines[i]);
+
+
+const outfn='raw/'+srcfn.replace('.dif','.json');
+if (outfn!==srcfn) {
+	if (writeChanged(outfn,JSON.stringify(entries,'',' '))) {
+		console.log('written',outfn,'length,',entries.length);
 	}
-}
-validate(content);
-const outfn='raw/dict-revised.txt';
-if (writeChanged(outfn,content)) {
-	console.log('written',outfn,'length,',entries.length);
+} else {
+	console.log('src filename must be .dif');
 }

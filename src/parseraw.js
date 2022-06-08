@@ -1,4 +1,6 @@
 import {styledNumber} from 'pitaka/utils'
+const py_regex=/([（）\(\)一二三四五六　又語讀音變ààāáǎíīìǐǒōóòéềèēěūúùüǔǚǜǘa-z ]+)/;
+
 const getSubdefs=(deq)=>{ //deq , def+examples+quotes
 	let subs=[],prevseq=0 ;
 	if (~deq.indexOf('(2)') || ~deq.indexOf('（2）')) { //有子義項，切分
@@ -68,6 +70,12 @@ export const parseRaw=lines=>{
         	en=orth.substr(at+1);
         	if (en[en.length-1]=='）'||en[en.length-1]==')' ) en=en.substr(0,en.length-1);
         	orth=orth.substr(0,at);
+    	}
+
+    	const m=py.match(py_regex);
+    	// console.log(m[1].length,py.length)
+    	if (py&& (!m || m[1].length!==py.length)) {
+    		console.log('wrong pinyin',py ,m&& m[1])
     	}
 
 		const defs=breakMeaning(rawdef);

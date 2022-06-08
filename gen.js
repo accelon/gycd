@@ -12,8 +12,9 @@ const lines=readTextLines(srcdir+srcfn);//.slice(100);;
 const rawdata=parseRaw(lines);
 
 let outfn=outdir+srcfn.replace('.txt','.off')
-const ctx={};
-let out=serialize(rawdata);
+const ctx={Strings:[],   Sentences:[] , Persons:[],  count:0};
+      //短字串(詞目,書名)   含標點的句子    人名朝代名
+let out=serialize(rawdata,ctx);
 out=identify(out,ctx);
 
 let wid='';
@@ -29,6 +30,12 @@ for (let i=0;i<out.length;i++) {
 	}	
 	out[i]=touch.trim();
 }
+
+const readonly=false;
+// const arrtype=fromObj(ctx.Types,(a,b)=>[a,b]);
+// arrtype.sort((a,b)=>b[1]-a[1]);
+
+if (!readonly) {
 
 console.log('writing');
 if (writeChanged(outfn,out.join('\n'))){
@@ -59,4 +66,6 @@ arr=fromObj(ctx.Persons,(a,b)=>[a,b[1]]); //drop the wid
 arr.sort((a,b)=>b[1]-a[1]);
 if (writeChanged(outfn,arr.join('\n'))){
 	console.log('written',outfn,arr.length)
+}
+
 }
