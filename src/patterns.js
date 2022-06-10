@@ -5,13 +5,13 @@ export const parseBookname=(source,books,sources)=>{
         if (!books[bookname]) books[bookname]=0;
         books[bookname]++;		
     }
-    if (!sources[sname]) sources[sname]=0;
-    sources[sname]++;	
+    if (!sources[source]) sources[source]=0;
+    sources[source]++;	
 }
 const QuoteRegex=/《([\u3400-\u9fff\ud400-\udfff]+)》：(.+)/;
-export const parseQuotes=_quotes=>{
+export const parseQuotes=(_quotes, books, sources)=>{
     const quotes=_quotes.split('\n');
     quotes.forEach(q=>{
-
+        // console.log(q)
     })
 }

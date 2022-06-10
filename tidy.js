@@ -11,9 +11,11 @@ import {fromDIF} from 'pitaka/format'
 import {fromExcelXML} from './src/excelxml.js'
 await nodefs;
 const srcdir='raw/';
+
 import PUA from './src/pua.js';
 let raw=[];
 const srcfn=process.argv[2]|| 'dict_idioms.xml'
+
 readTextLines('raw/sym.txt').forEach(line=>{
 	const at=line.indexOf(' ');
 	if (at==-1) return;
@@ -57,6 +59,7 @@ if (srcfn.endsWith('.dif')) {
 	const entityfn=srcfn.replace('.xml','-entity.json');
 	const entities=JSON.parse(readTextContent(srcdir+entityfn));
 	entries=fromExcelXML(raw,entities);
+	entries.shift();//drop field names
 } else throw "only support dif and xml";
 
 
@@ -86,7 +89,15 @@ const tidy=buf=>{
 }
 
 entries.shift();
-
+const entry_id={};
+entries.forEach(entry=>{
+	const [id,idiom]=entry;
+	if (entry_id[idiom] && id!=='354') { // 含沙射影 duplicated 8 and 354
+		console.log('duplicated idiom',id,idiom, entry_id[idiom]);
+	} else {
+		entry_id[idiom]=id;
+	}
+})
 
 
 const outfn='raw/'+srcfn.replace('.xml','.json');
@@ -96,4 +107,8 @@ if (outfn!==srcfn) {
 	}
 } else {
 	console.log('src filename must be .dif');
+}
+
+if (writeChanged(srcdir+'entry_id.json',JSON.stringify(entry_id,'',' '))) {
+	console.log('writting entry_id.json')
 }

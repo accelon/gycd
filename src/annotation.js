@@ -1,5 +1,5 @@
 
-export const parseAnnotation=(source_text,source_annotation,id,idiom)=>{
+export const parseAnnotation=(explaining,source_text,source_annotation,id,idiom)=>{
 	// if (id==421) console.log(source_annotation)
 	const words=[];
 	const vars=[];//words with different explaination in other idiom
