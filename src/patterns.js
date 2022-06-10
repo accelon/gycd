@@ -8,3 +8,10 @@ export const parseBookname=(source,books,sources)=>{
     if (!sources[sname]) sources[sname]=0;
     sources[sname]++;	
 }
+const QuoteRegex=/《([\u3400-\u9fff\ud400-\udfff]+)》：(.+)/;
+export const parseQuotes=_quotes=>{
+    const quotes=_quotes.split('\n');
+    quotes.forEach(q=>{
+
+    })
+}

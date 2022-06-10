@@ -1,7 +1,7 @@
 const _id=0,_idiom=1,_zhuyin=2,_pinyin=3,_definition=4,
 _source_name=5,_source_text=6,_source_annotation=7,_source_reference=8,
 _allusion=9,_sage_semantic=10,_usage_category=11,_usage_examples=12 ,
-_bookproof=13,_identify_synonym=14,_identify_antonym=15,_identify_examples=16,
+_quotes=13,_identify_synonym=14,_identify_antonym=15,_identify_examples=16,
 _mistake=17,_synonym=18,_antonym=19,_reference=20;
 
 export default {
@@ -14,6 +14,9 @@ export default {
     421:{
         [_source_annotation]:[['\n不穀','\n反：同「返」，歸返。\n不穀']],//缺 反的註釋，依文義補上
     },
+    4516:{
+        [_quotes]:[['七竅　（煙）騰','七竅烟（煙）騰']],
+    },  
     5110:{
         [_source_annotation]:[['開關:開啟關隘','開關：開啟關隘',1]]
     },

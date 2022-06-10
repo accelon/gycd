@@ -17,7 +17,7 @@
 
 ## build steps
     download https://github.com/g0v/moedict-data dict-revised*.xlt and export as utf-8 to raw/dict-revised*.txt
-    save *.xlt as *.dif and convert to utf-8
+    save *.xlt as *.xml 
 
     download sym.txt from https://github.com/g0v/moedict-pub/
 

@@ -6,12 +6,14 @@ to raw/dict-revised*.txt in utf-8 format
 
 */
 
-import {nodefs,writeChanged,readTextLines} from 'pitaka/cli';
+import {nodefs,writeChanged,readTextLines,readTextContent} from 'pitaka/cli';
 import {fromDIF} from 'pitaka/format'
+import {fromExcelXML} from './src/excelxml.js'
 await nodefs;
+const srcdir='raw/';
 import PUA from './src/pua.js';
 let raw=[];
-const srcfn=process.argv[2]|| 'dict-revised.txt'
+const srcfn=process.argv[2]|| 'dict_idioms.xml'
 readTextLines('raw/sym.txt').forEach(line=>{
 	const at=line.indexOf(' ');
 	if (at==-1) return;
@@ -26,7 +28,7 @@ for (let i=1;i<4;i++) {
 	raw.push(...  rawlines) ;
 }
 */
- raw=readTextLines('raw/'+srcfn);
+
 /*
 const fixMultiline=raw=>{
 	const out=[];
@@ -46,8 +48,17 @@ const fixMultiline=raw=>{
 }
 */
 
+let entries=[];
+if (srcfn.endsWith('.dif')) {
+	raw=readTextLines(srcdir+srcfn);
+	entries=fromDIF(raw);
+} else if (srcfn.endsWith('.xml')) {
+	raw=readTextContent(srcdir+srcfn);
+	const entityfn=srcfn.replace('.xml','-entity.json');
+	const entities=JSON.parse(readTextContent(srcdir+entityfn));
+	entries=fromExcelXML(raw,entities);
+} else throw "only support dif and xml";
 
-const entries=fromDIF(raw);
 
 const defPUA=cp=>{
 	if ((cp[0]=='2' && cp.length==5) || (cp[0]=='3'&&cp.length==4)) {
@@ -78,7 +89,7 @@ entries.shift();
 
 
 
-const outfn='raw/'+srcfn.replace('.dif','.json');
+const outfn='raw/'+srcfn.replace('.xml','.json');
 if (outfn!==srcfn) {
 	if (writeChanged(outfn,JSON.stringify(entries,'',' '))) {
 		console.log('written',outfn,'length,',entries.length);
