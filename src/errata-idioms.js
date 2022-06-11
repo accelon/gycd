@@ -5,6 +5,10 @@ _quotes=13,_identify_synonym=14,_identify_antonym=15,_identify_examples=16,
 _mistake=17,_synonym=18,_antonym=19,_reference=20;
 
 export default {
+    33:{//扶搖直上
+        [_usage_examples]: //依 WFG 本補
+        [['他遇貴人提拔','在一片缺水聲中，瓶裝飲用水的價錢扶搖直上。\n這項工程的預算逐年扶搖直上，真有點負擔不起。\n老董看了統計表上扶搖直上的業績曲線，眉開眼笑。\n＆\n他遇貴人提拔']]
+    },
     186:{ //顛沛流離
         [_source_name]:
         [['１、「顛沛」：《論語．里仁》《漢書．卷二四．食貨志上》','１、「顛沛」：《論語．里仁》\n◎《漢書．卷二四．食貨志上》',1]],//漢書是 流離 的典源

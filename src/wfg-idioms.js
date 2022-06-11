@@ -47,6 +47,7 @@ const codeName={
 	113:'identify',
 	114:'usage',
 	122:'usage', 
+	123:'usage', 
 	115:'definition',
 
 	131:'source_group',
@@ -57,6 +58,7 @@ const handlers={
 	106:function(o,ctx) {ctx.part=0},
 	114:function(o,ctx) {ctx.part=0},
 	122:function(o,ctx) {ctx.part=1},
+	123:function(o,ctx) {ctx.part=2}, //三組 用法
 	131:function(o,ctx) {ctx.part=0},
 	132:function(o,ctx) {ctx.part=1},
 
@@ -130,8 +132,9 @@ const linkAnnotation=(obj,part=0)=>{
 }
 const singleItem={orth:true,zy:true,py:true,synonym:true,antonym:true,related:true,allusion:true,definition:true,
 	//usage_semantic:true,usage_category:true,
-	source_group:true,source_bookname:true,source_group2:true,source_bookname2:true,
-	usage_semantic:true,usage_semantic2:true,usage_category:true,usage_category2:true,
+	source_group:true,source_bookname:true,usage_semantic:true,usage_category:true,
+	source_group2:true,source_bookname2:true,usage_semantic2:true,usage_category2:true,
+	source_group3:true,source_bookname3:true,usage_semantic3:true,usage_category3:true,
 	identify_synonym:true,identify_antonym:true ,mistake:true}
 const compactObject=obj=>{
 	for (let key in obj) {
@@ -163,6 +166,7 @@ export const parseIdiomEntryWFG=(buf,ctx)=>{
 		   .replace(/`20`用法/g,'`114`')
 		   .replace(/`7`⒈`2`/g,'`121`') 
 		   .replace(/`7`⒉`2`/g,'`122`') 
+		   .replace(/`7`⒊`2`/g,'`123`') 
 
 		   .replace(/`15`釋義\n`4`/g,'`115`')
 		   .replace(/`21`([^`]+)`1`/g,'^zy[$1]') //inline

@@ -2,6 +2,7 @@ const addCircleNum=arr=>{
 	return arr.filter(it=>!!it).map((it,idx)=> String.fromCodePoint(idx+0x2460)+it  );
 }
 const markAnnotation=str=>{
+	// if (!str)return [];
 	return str.split(/\r?\n/).filter(it=>!!it).
 	map((it,idx)=>{
 		const at=it.indexOf('：');
@@ -9,6 +10,7 @@ const markAnnotation=str=>{
 	})
 }
 const markQuote=str=>{
+	// if (!str) return []
 	return str.replace(/\r?\n?\*(\d+)\*(.+?)\r?\n/g,(m,n,w)=>{
 		return '^f'+n+'['+w+']';
 	}).replace(/([？。])\^f1/,'$1\n^f1') //灰段(不帶注腳)和帶注腳段要分開
@@ -31,19 +33,23 @@ export const parseIdiomEntry=(buf,ctx)=>{
 
 	if (source_name.length>1) { //multi source idiom
 		let at=source_name[0].indexOf('：');
-		const source_texts=source_text.split('＆').filter(it=>it.trim()); 
-		const annotations=source_annotation.split('＆').filter(it=>it.trim())
+		const source_texts=source_text.split(/[＋＆◎]/).filter(it=>it.trim()); 
+		const annotations=source_annotation.split(/[＋＆◎]/).filter(it=>it.trim())
 		obj.source_group=source_name[0].slice(0,at+1).replace(/[「」]/g,'');
 		obj.source_bookname=source_name[0].slice(at+1);
 		obj.quotes=markQuote(source_texts[0])
-		obj.annotation=markAnnotation(annotations[0])
+		if (!annotations[0] && obj.id!==261) console.log('missing annotations',obj.orth)
+		obj.annotation=annotations[0]?markAnnotation(annotations[0]):[];
 
 		at=source_name[1].indexOf('：');
 		obj.source_group2=source_name[1].slice(0,at+1).replace(/[「」]/g,'');
 		obj.source_bookname2=source_name[1].slice(at+1);
 
-		obj.quotes2=markQuote(source_texts[1])
-		obj.annotation2=markAnnotation(annotations[1])
+		 if (!source_texts[1]) console.log('missing quote2',obj.orth)
+		obj.quotes2=source_texts[1]?markQuote(source_texts[1]):[];
+
+		 // if (!annotations[1]) console.log('missing annotations2',obj.orth)
+		obj.annotation2=annotations[1]?markAnnotation(annotations[1]):[];
 	
 	} else {
 		obj.source_bookname=_source_name;
@@ -65,7 +71,8 @@ export const parseIdiomEntry=(buf,ctx)=>{
 
 		obj.usage_semantic2=usage_semantics[1]
 		obj.usage_category2=usage_categories[1]
-		obj.usecase2=addCircleNum(usecases[1].split(/\r?\n/))
+		if (!usecases[1]) console.log('missing usecase2',obj.orth)
+		obj.usecase2=addCircleNum((usecases[1]||'').split(/\r?\n/))
 	} else {
 		obj.usage_semantic=usage_semantic;
 		obj.usage_category=usage_category;
