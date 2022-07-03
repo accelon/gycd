@@ -18,12 +18,15 @@ const markQuote=str=>{
 	.map(it=>it[0]=='#'?it.slice(1):it) //remove the # (灰段標記)
 }
 export const parseIdiomEntry=(buf,ctx)=>{
-	const [id,orth,zy,py,definition,
+	let [id,orth,zy,py,definition,
 	_source_name,source_text,source_annotation,source_reference,
 	allusion,usage_semantic,usage_category,usecase ,
 	bookproof,identify_synonym,identify_antonym,identify_examples,
 	mistake,synonym,antonym,related] = buf;
 
+	definition=definition.replace(/<br>(\d+)\./g,'\n$1.')
+	.replace(/<br><a name=([^>]+)>　<\/a>/g,'△「$1」')
+	.replace(/\n?(0\d)\./g,(m,m1)=>'\n'+String.fromCodePoint(parseInt(m1)-1+0x2460 ))
 	const obj={id:parseInt(id),orth,zy,py,synonym,antonym,related,definition}
 
 	const source_name=_source_name.split(/\r?\n/);
@@ -38,7 +41,9 @@ export const parseIdiomEntry=(buf,ctx)=>{
 		obj.source_group=source_name[0].slice(0,at+1).replace(/[「」]/g,'');
 		obj.source_bookname=source_name[0].slice(at+1);
 		obj.quotes=markQuote(source_texts[0])
-		if (!annotations[0] && obj.id!==261) console.log('missing annotations',obj.orth)
+		if (!annotations[0] && obj.id!==261) {//只有 啞口無言 無注釋
+			console.log('missing annotations',obj.orth)
+		}
 		obj.annotation=annotations[0]?markAnnotation(annotations[0]):[];
 
 		at=source_name[1].indexOf('：');
@@ -58,8 +63,13 @@ export const parseIdiomEntry=(buf,ctx)=>{
 	}
 
 	obj.allusion=allusion;
+	bookproof=bookproof.replace(/（源） ?(\d+)\./g,'\n$1.')
+	.replace(/<br>(\d+)\./g,'\n$1.')
+	.replace(/\n?（([一二三])）(\d+)\./g,'\n（$1）$2.')
+	;//少了換行
+
 	obj.bookproof=bookproof.split(/\r?\n/).map(it=>
-		it.replace(/^(\d+)\./,(m,m1)=>String.fromCodePoint(parseInt(m1)-1+0x2460 )))
+		it.replace(/(\d+)\./,(m,m1)=>String.fromCodePoint(parseInt(m1)-1+0x2460 )))
 
 	if (usage_semantics.length>1) {
 		const usage_categories=usage_category.split('＆');
