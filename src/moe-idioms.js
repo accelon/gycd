@@ -25,7 +25,8 @@ export const parseIdiomEntry=(buf,ctx)=>{
 	mistake,synonym,antonym,related] = buf;
 
 	definition=definition.replace(/<br>(\d+)\./g,'\n$1.')
-	.replace(/<br><a name=([^>]+)>　<\/a>/g,'△「$1」')
+	.replace(/　?<a name=([^>]+)>　<\/a>/g,'△「$1」')
+	.replace(/<br>△/g,'△').replace(/<br>$/,'')
 	.replace(/\n?(0\d)\./g,(m,m1)=>'\n'+String.fromCodePoint(parseInt(m1)-1+0x2460 ))
 	const obj={id:parseInt(id),orth,zy,py,synonym,antonym,related,definition}
 
@@ -66,10 +67,11 @@ export const parseIdiomEntry=(buf,ctx)=>{
 	bookproof=bookproof.replace(/（源） ?(\d+)\./g,'\n$1.')
 	.replace(/<br>(\d+)\./g,'\n$1.')
 	.replace(/\n?（([一二三])）(\d+)\./g,'\n（$1）$2.')
+	.replace(/<br>$/g,'')
 	;//少了換行
 
 	obj.bookproof=bookproof.split(/\r?\n/).map(it=>
-		it.replace(/(\d+)\./,(m,m1)=>String.fromCodePoint(parseInt(m1)-1+0x2460 )))
+		it.trim().replace(/(\d+)\./,(m,m1)=>String.fromCodePoint(parseInt(m1)-1+0x2460 )))
 
 	if (usage_semantics.length>1) {
 		const usage_categories=usage_category.split('＆');
