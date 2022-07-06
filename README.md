@@ -22,7 +22,7 @@
     download sym.txt from https://github.com/g0v/moedict-pub/
 
     node xml2json  //轉換缺字，修正多個義項折行問題，產生乾淨的 json ，二維陣列，每個元素為一個cell
-    node conv-moe   // 規範 標點
+    node tidy-cyd  // 規範 標點
     node extract-fields //抽出詞目、人名、書名，
 
     node gen-cyd //產生 成語典 offtext

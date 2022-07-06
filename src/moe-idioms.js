@@ -13,9 +13,15 @@ const markQuote=str=>{
 	// if (!str) return []
 	return str.replace(/\r?\n?\*(\d+)\*(.+?)\r?\n/g,(m,n,w)=>{
 		return '^f'+n+'['+w+']';
-	}).replace(/([？。])\^f1/,'$1\n^f1') //灰段(不帶注腳)和帶注腳段要分開
+	}) //灰段(不帶注腳)和帶注腳段要分開
+	.replace(/([？。])\^f1/,'$1\n^f1')
 	.split(/\r?\n/).filter(it=>!!it)
 	.map(it=>it[0]=='#'?it.slice(1):it) //remove the # (灰段標記)
+}
+const markFootnote=str=>{
+	return str.replace(/\*(\d+)\*/g,(m,n,w)=>{
+		return '^f'+n;
+	})
 }
 export const parseIdiomEntry=(buf,ctx)=>{
 	let [id,orth,zy,py,definition,
@@ -40,7 +46,7 @@ export const parseIdiomEntry=(buf,ctx)=>{
 		const source_texts=source_text.split(/[＋＆◎]/).filter(it=>it.trim()); 
 		const annotations=source_annotation.split(/[＋＆◎]/).filter(it=>it.trim())
 		obj.source_group=source_name[0].slice(0,at+1).replace(/[「」]/g,'');
-		obj.source_bookname=source_name[0].slice(at+1);
+		obj.source_bookname=markFootnote(source_name[0].slice(at+1));
 		obj.quotes=markQuote(source_texts[0])
 		if (!annotations[0] && obj.id!==261) {//只有 啞口無言 無注釋
 			console.log('missing annotations',obj.orth)
@@ -49,7 +55,7 @@ export const parseIdiomEntry=(buf,ctx)=>{
 
 		at=source_name[1].indexOf('：');
 		obj.source_group2=source_name[1].slice(0,at+1).replace(/[「」]/g,'');
-		obj.source_bookname2=source_name[1].slice(at+1);
+		obj.source_bookname2=markFootnote(source_name[1].slice(at+1));
 
 		 if (!source_texts[1]) console.log('missing quote2',obj.orth)
 		obj.quotes2=source_texts[1]?markQuote(source_texts[1]):[];
@@ -58,12 +64,24 @@ export const parseIdiomEntry=(buf,ctx)=>{
 		obj.annotation2=annotations[1]?markAnnotation(annotations[1]):[];
 	
 	} else {
-		obj.source_bookname=_source_name;
+		obj.source_bookname=markFootnote(_source_name);
 		obj.quotes=markQuote(source_text);
 		obj.annotation=markAnnotation(source_annotation)
 	}
 
-	obj.allusion=allusion;
+	let allusionsource='';
+	//save 4 mb
+	allusion.replace(/^此處所列為「([^」]+)」之典故說明，提供參考。/,(m,m1)=>{
+		allusionsource=m1;
+		return '';
+	});
+	if (allusionsource) {
+		obj.allusion='△'+allusionsource;
+	} else {
+		obj.allusion=allusion;
+	}
+
+	
 	bookproof=bookproof.replace(/（源） ?(\d+)\./g,'\n$1.')
 	.replace(/<br>(\d+)\./g,'\n$1.')
 	.replace(/\n?（([一二三])）(\d+)\./g,'\n（$1）$2.')
