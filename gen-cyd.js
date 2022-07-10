@@ -14,11 +14,8 @@ const Books=readTextLines(srcdir+'books.txt'); //是詞目的熟語
 const Persons=readTextLines(srcdir+'persons.txt'); //是詞目的熟語
                 
 
-const out=`^_[memo="教育部成語典"]
-^_e[caption=詞目 idtype=number unique=true]
-^_syn[innertext=true caption=同義詞]
-^_ant[innertext=true caption=反義詞]
-^_rel[innertext=true caption=相關]
+const out=`^_[name=cyd zh=教育部成語典 _syn=keys _ant=keys _rel=keys ]
+^_e[caption=詞目 _id=unique_number]
 ^_def[caption=釋文]
 `.split(/\r?\n/)
 
@@ -42,9 +39,9 @@ content.forEach(entry=>{
 	for (let f in entry) {
 		if (f=="id") id=entry[f];
 		else if (f=='orth') orth='^e'+id+'['+entry[f];
-		else if (f=='synonym') syn=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join('.');
-		else if (f=='antonym') ant=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join('.');
-		else if (f=='related') rel=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join('.');
+		else if (f=='synonym') syn=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='antonym') ant=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='related') rel=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='definition') {
 			out.push(orth+ (syn?' syn='+syn:'') + (ant?' ant='+ant:'') +(syn?' rel='+rel:'')+']');
 			//△「」是多餘的，在synonym 

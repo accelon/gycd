@@ -5,3 +5,5 @@ gycd
 *.json
 moedict-data
 raw
+cyd
+*.offtext

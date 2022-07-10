@@ -5,6 +5,7 @@ patchBuf,fromObj,toObj,incObj,extractAuthor,extractBook,alphabetically,alphabeti
 
 await nodefs
 const outdir='tidied/';
+const outdir2='cyd.offtext/';
 const srcfile='tidied/dict_idioms.json'
 /* parse raw/idioms.txt */
 const sources={};
@@ -89,8 +90,8 @@ for (let i=0;i<idiomslexicon.length;i++) {
 }
 */
 const out=idiomslexicon.map(it=>it[0]+'='+it[1]);
-out.unshift('^lexicon[orth=number cyd=unique_number synonym=lemmalist antonym=lemmalist related=lemmalist reference=lemmalist] ');
-if (writeChanged(outdir+'cyd-lemma.off',out.join('\n'))) {
+out.unshift('^_[format=lexicon _orth=num _id=unum _syn=keys _ant=keys _rel=keys] ');
+if (writeChanged(outdir2+'cyd-lemma.off',out.join('\n'))) {
 	console.log('written cyd-lemma.off')
 }
 
