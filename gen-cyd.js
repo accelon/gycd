@@ -10,14 +10,13 @@ const content=JSON.parse(readTextContent(srcfile));
 
 const Orth=readTextLines(srcdir+'orth.txt'); //是詞目的熟語
 const Nonorth=readTextLines(srcdir+'nonorth.txt'); //非詞目的熟語
-const Books=readTextLines(srcdir+'books.txt'); //是詞目的熟語
-const Persons=readTextLines(srcdir+'persons.txt'); //是詞目的熟語
+const Books=readTextLines(srcdir+'books.txt'); 
+const Persons=readTextLines(srcdir+'persons.txt'); 
                 
 
-const out=`^_[name=cyd zh=教育部成語典 _syn=keys _ant=keys _rel=keys ]
-^_e[caption=詞目 _id=unique_number]
-^_def[caption=釋文]
-`.split(/\r?\n/)
+const out=`^_[ptk=cyd zh=教育部成語典]
+^_e[caption=詞目 mandatory=id:unique_number optional=syn:keys,ant:keys,rel:keys]
+^_def[caption=釋文]`.split(/\r?\n/)
 
 const orthId=str=>{
 	const at=bsearch(Orth,str);
@@ -39,9 +38,9 @@ content.forEach(entry=>{
 	for (let f in entry) {
 		if (f=="id") id=entry[f];
 		else if (f=='orth') orth='^e'+id+'['+entry[f];
-		else if (f=='synonym') syn=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
-		else if (f=='antonym') ant=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
-		else if (f=='related') rel=entry[f].split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='synonym') syn=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='antonym') ant=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='related') rel=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='definition') {
 			out.push(orth+ (syn?' syn='+syn:'') + (ant?' ant='+ant:'') +(syn?' rel='+rel:'')+']');
 			//△「」是多餘的，在synonym 

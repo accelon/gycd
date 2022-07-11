@@ -4,8 +4,7 @@ const {nodefs,writeChanged,readTextContent,bsearch,xorStrings,writeIncObj,
 patchBuf,fromObj,toObj,incObj,extractAuthor,extractBook,alphabetically,alphabetically0}=PTK;
 
 await nodefs
-const outdir='tidied/';
-const outdir2='cyd.offtext/';
+const outdir='cyd.offtext/';
 const srcfile='tidied/dict_idioms.json'
 /* parse raw/idioms.txt */
 const sources={};
@@ -35,6 +34,10 @@ const addIdiom=(str,role, orth)=>{
 		}
 	}
 }
+const addPropername=(obj,str,orth)=>{
+	if (!obj[str])  obj[str]=[];
+	if (obj[str].indexOf(orth)==-1) obj[str].push(orth);
+}
 const content=JSON.parse(readTextContent(srcfile));
 let orth='',cydid='';
 content.forEach(entry=>{
@@ -62,11 +65,11 @@ content.forEach(entry=>{
 		}
 		if (persons_fields[f]) {
 			const out=extractAuthor( entry[f] );
-			out.forEach( it=>incObj(persons,it) );
+			out.forEach( it=>addPropername(persons,it,orth) );
 		}
 		if (booknames_fields[f]) {
 			const out=extractBook( entry[f] );
-			out.forEach( it=>incObj(booknames,it) );
+			out.forEach( it=>addPropername(booknames,it, orth) );
 		}
 	}
 	
@@ -77,62 +80,27 @@ const idiomslexicon=fromObj(idioms,(k,v)=>{
 idiomslexicon.sort(alphabetically0)
 const lemma=idiomslexicon.map(it=>it[0]);
 
-//replace lemma with idx
-
-/* 200kb
-for (let i=0;i<idiomslexicon.length;i++) {
-	const entry=idiomslexicon[i][1];
-	for (let j=1;j<entry.length;j++) {
-		const arr=entry[j];
-		if (arr.length) entry[j]=pack2(arr.map( it=> bsearch(lemma,it)  ));
-	}
-	idiomslexicon[i][1]=entry.join(SEPARATOR2D)
-}
-*/
-const out=idiomslexicon.map(it=>it[0]+'='+it[1]);
-out.unshift('^_[format=lexicon _orth=num _id=unum _syn=keys _ant=keys _rel=keys] ');
-if (writeChanged(outdir2+'cyd-lemma.off',out.join('\n'))) {
-	console.log('written cyd-lemma.off')
+let out=idiomslexicon.map(it=>it[0]+'\t'+it[1]);
+out.unshift('^_[type=tsv name=lemma]\torth:number\tid:unique_number\tsyn:keys\tant:keys\trel:keys');
+if (writeChanged(outdir+'1-lemma.tsv',out.join('\n'))) {
+	console.log('written 1-lemma.tsv')
 }
 
-/*
-//所有成語
-const allidioms=writeIncObj(idioms,outdir+'idioms.txt');
+const persons_ = fromObj(persons,(a,b)=>[a,b]);
+out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
+out.unshift('^_[type=tsv name=persons]\tlemma:keys'); //  出現此人的詞目列表
 
-orth.sort(alphabetically);
-const nonorth_idioms=xorStrings(allidioms,orth,0);
-
-
-if (writeChanged(outdir+'orth.txt',orth.join('\n'))) {
-	console.log('orth.txt',orth.length)
+if (writeChanged(outdir+'2-persons.tsv',out.join('\n'),'utf8')) {
+	console.log('written 2-persons.tsv',outdir+'persons.tsv',persons_.length)
 } else {
-	console.log('orth.txt no differnce')
+	console.log('persons.tsv no differnce')
 }
-let nonorth=writeIncObj(nonorth_idioms,outdir+'nonorth-stat.txt');
+const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);
+out=booknames_.sort(alphabetically0).map(it=>it.join('\t'));
+out.unshift('^_[type=tsv name=booknames]\tlemma:keys'); //  出現此書的詞目列表
 
-//不是詞目的成語
-if (writeChanged(outdir+'nonorth.txt',nonorth.map(it=>it[0]).sort(alphabetically).join('\n'),'utf8')) {
-	console.log('written nonorth.txt',nonorth.length)
-} else {
-	console.log('nonorth.txt no differnce')
-}
-*/
-
-const persons_=writeIncObj(persons,outdir+'persons-stat.txt');
-if (writeChanged(outdir+'persons.txt',persons_.map(it=>it[0]).sort(alphabetically).join('\n'),'utf8')) {
-	console.log('written persons.txt',persons_.length)
-} else {
-	console.log('persons.txt no differnce')
-}
-
-
-
-const book_fields=writeIncObj(booknames,outdir+'books-stat.txt');
-if (writeChanged(outdir+'books.txt',book_fields.map(it=>it[0]).sort(alphabetically).join('\n'),'utf8')) {
-	console.log('written books.txt',book_fields.length)
+if (writeChanged(outdir+'3-books.tsv',out.join('\n'),'utf8')) {
+	console.log('written 3-books.tsv',outdir+'books.tsv',booknames_.length)
 } else {
 	console.log('books.txt no differnce')
 }
-
-
-//writeIncObj(allusions,outdir+'allusions-stat.txt');
