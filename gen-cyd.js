@@ -14,9 +14,9 @@ const Books=readTextLines(srcdir+'books.txt');
 const Persons=readTextLines(srcdir+'persons.txt'); 
                 
 
-const out=`^_[ptk=cyd zh=教育部成語典]
-^_e[caption=詞目 mandatory=id:unique_number optional=syn:keys,ant:keys,rel:keys]
-^_def[caption=釋文]`.split(/\r?\n/)
+const out=`^_<ptk=cyd zh=教育部成語典>
+^:e<caption=詞目 mandatory=id:unique_number optional=syn:keys,ant:keys,rel:keys>
+^:def<caption=釋文>`.split(/\r?\n/)
 
 const orthId=str=>{
 	const at=bsearch(Orth,str);
@@ -37,12 +37,12 @@ let id,orth,syn,ant,rel;
 content.forEach(entry=>{
 	for (let f in entry) {
 		if (f=="id") id=entry[f];
-		else if (f=='orth') orth='^e'+id+'['+entry[f];
+		else if (f=='orth') orth='^e'+id+'<'+entry[f];
 		else if (f=='synonym') syn=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='antonym') ant=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='related') rel=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='definition') {
-			out.push(orth+ (syn?' syn='+syn:'') + (ant?' ant='+ant:'') +(syn?' rel='+rel:'')+']');
+			out.push(orth+ (syn?' syn='+syn:'') + (ant?' ant='+ant:'') +(syn?' rel='+rel:'')+'>');
 			//△「」是多餘的，在synonym 
 
 			let def=entry[f];
@@ -50,19 +50,19 @@ content.forEach(entry=>{
 
 			def=def.replace(/「([＿\u3400-\u9fff\ud800-\udfff，]{3,10})」/g,(m,m1)=>{
 			 	const sid=orthId(m1);
-			 	return '^ref'+sid+'['+m1+']';
+			 	return '^ref'+sid+'<'+m1+'>';
 			});
 
 			def=replaceAuthor(def,(prefix,str,suffix)=>{
 				const auid=authorId(str);
-				return prefix+(auid?'^au['+str+']':str)+suffix;
+				return prefix+(auid?'^au<'+str+'>':str)+suffix;
 			})
 			def=replaceBook(def,(prefix,str,suffix)=>{
 				const bkid=bookId(str);
-				return prefix+(bkid?'^ti['+str+']':str)+suffix;
+				return prefix+(bkid?'^ti<'+str+'>':str)+suffix;
 			})			
 
-			out.push(def);
+			out.push(def.replace(/\n+/g,'\n')); //remove inner blank lines
 		}
 	}
 });
