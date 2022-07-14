@@ -1,4 +1,8 @@
-﻿off
+﻿*.com
+*.ptk
+*.zip
+*.7z
+off
 *.txt
 gycd
 *.off
