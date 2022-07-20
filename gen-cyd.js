@@ -1,6 +1,7 @@
 import * as PTK from 'ptk/nodebundle.cjs';
 const {nodefs,writeChanged,readTextContent,readTextLines,bsearch,
-fromObj,patchBuf,toObj,incObj,extractAuthor,extractBook,replaceAuthor,replaceBook}=PTK;
+fromObj,patchBuf,toObj,incObj,codePointLength,
+extractAuthor,extractBook,replaceAuthor,replaceBook}=PTK;
 
 await nodefs;
 const outfile='cyd.offtext/cyd.off'
@@ -8,31 +9,33 @@ const srcdir='tidied/'
 const srcfile=srcdir+'dict_idioms.json'
 const content=JSON.parse(readTextContent(srcfile));
 
-const Orth=readTextLines(srcdir+'orth.txt'); //是詞目的熟語
-const Nonorth=readTextLines(srcdir+'nonorth.txt'); //非詞目的熟語
-const Books=readTextLines(srcdir+'books.txt'); 
-const Persons=readTextLines(srcdir+'persons.txt'); 
+const Lemma=readTextLines('cyd.offtext/1-lemma.tsv'); //是詞目及非詞目的熟語
+Lemma.shift();
+const Books=readTextLines('cyd.offtext/2-books.tsv'); 
+Books.shift();
+const Persons=readTextLines('cyd.offtext/3-persons.tsv'); 
+Persons.shift();
                 
 
 const out=`^_<ptk=cyd zh=教育部成語典>
-^:e<caption=詞目 id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
+^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
 ^:def<caption=釋文>
+^:ti
+^:au
 ^:cf`.split(/\r?\n/)
 
 const orthId=str=>{
-	const at=bsearch(Orth,str);
-	if (Orth[at]===str) return at;
-	const at2=bsearch(Nonorth,str);
-	if (Nonorth[at2]===str) return at2+Orth.length;  //非詞目熟語 序号從這裡起算
+	const at=bsearch(Lemma,str);
+	if (Lemma[at].startsWith(str+'\t')) return at;
 	else throw "unable to locate str "+str;
 }
 const authorId=str=>{
 	const at=bsearch(Persons,str);
-	if (Persons[at]===str) return at;
+	if (Persons[at].startsWith(str+'\t')) return at;
 }
 const bookId=str=>{
 	const at=bsearch(Books,str);
-	if (Books[at]===str) return at;
+	if (Books[at].startsWith(str+'\t')) return at;
 }
 let id,orth,syn,ant,rel;
 content.forEach(entry=>{
@@ -57,11 +60,11 @@ content.forEach(entry=>{
 
 			def=replaceAuthor(def,(prefix,str,suffix)=>{
 				const auid=authorId(str);
-				return prefix+(auid?'^au<'+str+'>':str)+suffix;
+				return prefix+(auid?'^au~'+codePointLength(str)+str:str)+suffix;
 			})
 			def=replaceBook(def,(prefix,str,suffix)=>{
 				const bkid=bookId(str);
-				return prefix+(bkid?'^ti<'+str+'>':str)+suffix;
+				return (bkid?'^ti'+prefix+str:str)+suffix;
 			})			
 
 			out.push(def.replace(/\n+/g,'\n')); //remove inner blank lines
