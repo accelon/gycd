@@ -81,29 +81,16 @@ idiomslexicon.sort(alphabetically0)
 const lemma=idiomslexicon.map(it=>it[0]);
 
 let out=idiomslexicon.map(it=>it[0]+'\t'+it[1]);
-out.unshift('^_<ptk=cyd type=tsv name=lemma preload=true>\torth:number/[012]\tid=unique_number\tsyn=keys\tant=keys\trel=keys');
-if (writeChanged(outdir+'1-lemma.tsv',out.join('\n'))) {
-	console.log('written 1-lemma.tsv',outdir+'books.tsv',idiomslexicon.length)
-} else {
-	console.log('1-lemma.tsv no difference',idiomslexicon.length)
-}
+out.unshift('^_<ptk=cyd type=tsv name=lemma preload=true>\torth=number/[012]\toid=unique_number\tsyn=keys\tant=keys\trel=keys');
+writeChanged(outdir+'1-lemma.tsv',out.join('\n'));
 
 const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);
 out=booknames_.sort(alphabetically0).map(it=>it.join('\t'));
 out.unshift('^_<ptk=cyd type=tsv name=booknames preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
-
-if (writeChanged(outdir+'2-books.tsv',out.join('\n'),'utf8')) {
-	console.log('written 2-books.tsv',outdir+'books.tsv',booknames_.length)
-} else {
-	console.log('books.txt no difference',booknames_.length)
-}
+writeChanged(outdir+'2-books.txt',out.join('\n'),true)
 
 const persons_ = fromObj(persons,(a,b)=>[a,b]);
 out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
 out.unshift('^_<ptk=cyd type=tsv name=persons preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
 
-if (writeChanged(outdir+'3-persons.tsv',out.join('\n'),'utf8')) {
-	console.log('written 3-persons.tsv',outdir+'persons.tsv',persons_.length)
-} else {
-	console.log('persons.tsv no difference',persons_.length)
-}
+writeChanged(outdir+'3-persons.tsv',out.join('\n'),true)

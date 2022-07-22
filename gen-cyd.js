@@ -15,7 +15,7 @@ const Books=readTextLines('cyd.offtext/2-books.tsv');
 Books.shift();
 const Persons=readTextLines('cyd.offtext/3-persons.tsv'); 
 Persons.shift();
-                
+
 
 const out=`^_<ptk=cyd zh=教育部成語典>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
@@ -37,15 +37,25 @@ const bookId=str=>{
 	const at=bsearch(Books,str);
 	if (Books[at].startsWith(str+'\t')) return at;
 }
-let id,orth,syn,ant,rel;
+let id,orth,syn,ant,rel ,idobj={};
 content.forEach(entry=>{
 	for (let f in entry) {
-		if (f=="id") id=entry[f];
-		else if (f=='orth') orth=entry[f];
+		
+		if (f=='orth') orth=entry[f];
 		else if (f=='synonym') syn=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='antonym') ant=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='related') rel=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='definition') {
+			/* use indexOf 1-lemma.off as id */
+			const id=bsearch(Lemma,orth);
+			if (id<0) throw "not found in lemma"+orth;
+			if (idobj[id]) {
+				console.log('dup item' , orth)
+				continue;
+			} else {
+				idobj[id]=orth;	
+			}
+			
 			const attrs=((syn?'syn='+syn:'') + (ant?' ant='+ant:'') +(syn?' rel='+rel:'')).trim();
 			out.push('^e'+id+(attrs?'<'+attrs+'>':'')+'【'+orth+'】');
 			//△「」是多餘的，在synonym 
