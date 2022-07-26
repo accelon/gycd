@@ -38,13 +38,43 @@ const bookId=str=>{
 	if (Books[at].startsWith(str+'\t')) return at;
 }
 let id,orth,syn,ant,rel ,idobj={};
+const doQuotes=(source, annotation,orth)=>{ //將annotation 的名相解釋填入source (含source_name 及quotes )的 ^f
+	const fn=[];
+	for (let i=0;i<annotation.length;i++) {
+		const ann=annotation[i];
+		const m=ann.match(/fn(\d+)(｛[^｝]+｝)?(.+)/);
+		if (!m) {
+			console.log('wrong fn format '+orth);
+			return '';
+		}
+		fn[ parseInt(m[1])-1] = m[3];
+	}
+	return source.replace(/\^f(\d+)(~\d+)?/g,(m,m1,m2)=>{
+		const n=parseInt(m1)-1;
+		if (!fn[n]) {
+			console.log("missing fn "+m1+' of '+orth);
+			return '^f'+m1+(m2||'');
+		}
+		return '^f'+m1+(m2||'')+'<note="'+fn[n]+'">';
+	})
+
+}
 content.forEach(entry=>{
+	let quotes,source,source_bookname;
 	for (let f in entry) {
-		
 		if (f=='orth') orth=entry[f];
 		else if (f=='synonym') syn=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='antonym') ant=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='related') rel=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
+		else if (f=='quotes') {
+			source=source_bookname+entry[f].join('');
+		}
+		else if (f=='source_bookname') {
+			source_bookname=entry[f];
+		}
+		else if (f=='annotation'){
+			out.push('典故：'+doQuotes(source,entry[f], orth));
+		}
 		else if (f=='definition') {
 			/* use indexOf 1-lemma.off as id */
 			const id=bsearch(Lemma,orth);

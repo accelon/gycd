@@ -1,3 +1,4 @@
+import {codePointLength} from 'ptk/nodebundle.cjs'
 const addCircleNum=arr=>{
 	return arr.filter(it=>!!it).map((it,idx)=> String.fromCodePoint(idx+0x2460)+it  );
 }
@@ -5,14 +6,16 @@ const markAnnotation=str=>{
 	// if (!str)return [];
 	return str.split(/\r?\n/).filter(it=>!!it).
 	map((it,idx)=>{
-		const at=it.indexOf('：');
-		return '^fn'+(idx+1)+'['+it.slice(0,at)+'] '+it.slice(at+1)
+		const at=it.indexOf('：'); //source_name 的注無對應名詞，而是在書名後。
+		const term=at>0?'｛'+it.slice(0,at)+'｝':'';
+		return '^fn'+(idx+1)+term+it.slice(at+1);
 	})
 }
 const markQuote=str=>{
 	// if (!str) return []
 	return str.replace(/\r?\n?\*(\d+)\*(.+?)\r?\n/g,(m,n,w)=>{
-		return '^f'+n+'['+w+']';
+		const len=codePointLength(w);
+		return '^f'+n+'~'+len+w;
 	}) //灰段(不帶注腳)和帶注腳段要分開
 	.replace(/([？。])\^f1/,'$1\n^f1')
 	.split(/\r?\n/).filter(it=>!!it)
@@ -23,6 +26,7 @@ const markFootnote=str=>{
 		return '^f'+n;
 	})
 }
+
 export const parseIdiomEntry=(buf,ctx)=>{
 	let [id,orth,zy,py,definition,
 	_source_name,source_text,source_annotation,source_reference,
