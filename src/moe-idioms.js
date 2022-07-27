@@ -7,7 +7,7 @@ const markAnnotation=str=>{
 	return str.split(/\r?\n/).filter(it=>!!it).
 	map((it,idx)=>{
 		const at=it.indexOf('：'); //source_name 的注無對應名詞，而是在書名後。
-		const term=at>0?'｛'+it.slice(0,at)+'｝':'';
+		const term=at>0?'｛'+it.slice(0,at).trim()+'｝':'';
 		return '^fn'+(idx+1)+term+it.slice(at+1);
 	})
 }

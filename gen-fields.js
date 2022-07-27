@@ -1,6 +1,6 @@
 import * as PTK from 'ptk/nodebundle.cjs';
 const {nodefs,writeChanged,readTextContent,bsearch,xorStrings,writeIncObj,
-	pack2,SEPARATOR2D,
+	pack2,SEPARATOR2D,replaceZhuyin,toBase26,
 patchBuf,fromObj,toObj,incObj,extractAuthor,extractBook,alphabetically,alphabetically0}=PTK;
 
 await nodefs
@@ -16,6 +16,7 @@ const idioms={}; //所有的成語，無論是不是 條目
 const booknames={};//書名  ．陳亮《
 const persons={}  ;//．[u3400-\u9fff\ud800-\udfff]{2,5}《  allusion source_bookname definition bookproof
 const allusions={};
+const annotations={};
 const persons_fields=toObj("allusion,source_bookname,definition,bookproof".split(','));
 const booknames_fields=toObj("allusion,source_bookname,definition,bookproof".split(','));
 const idioms_fields="synonym,antonym,related".split(',');
@@ -71,6 +72,20 @@ content.forEach(entry=>{
 			const out=extractBook( entry[f] );
 			out.forEach( it=>addPropername(booknames,it, orth) );
 		}
+		if (f=='annotation') {
+			for (let i=0;i<entry[f].length;i++) {
+				const m=entry[f][i].match(/fn(\d+)(｛[^｝]+｝)?(.+)/);
+				if (m&&m[2]) {
+					const term=m[2].slice(1,m[2].length-1);
+					if (!annotations[term])  annotations[term]=[ [],[]];
+					const ann=replaceZhuyin(m[3]);
+					if (annotations[term][0].indexOf(ann)==-1) {
+						annotations[term][0].push(ann);
+						annotations[term][1].push(orth);
+					}
+				}
+			}
+		}
 	}
 	
 })
@@ -94,3 +109,19 @@ out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
 out.unshift('^_<ptk=cyd type=tsv name=persons preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
 
 writeChanged(outdir+'3-persons.tsv',out.join('\n'),true)
+
+let maxann=0;
+const annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
+	const out=[];
+	if (ann.length>maxann) maxann=ann.length;
+	for (let i=0;i<ann.length;i++) {
+		out.push( [ k , id[i] ,ann[i]  ]);
+	}
+	return out;
+}).flat().map(it=>it.join('\t'));
+
+annotationlexicon.sort(alphabetically0)
+annotationlexicon.unshift('^_<ptk=cyd type=tsv name=annotation preload=true>\te=key:lemma\tann=text'); //  出現此人的詞目列表
+
+writeChanged(outdir+'4-annotations.tsv',annotationlexicon.join('\n'),true)
+console.log('max ann',maxann)

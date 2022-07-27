@@ -86,6 +86,9 @@ export default {
 	291:{
 	[_usecase]:[['</table>','']],
 	},
+	395:{
+	[_source_annotation]:[['元帝南遷 ,尚未即位','元帝南遷，尚未即位']] //do not allow comma
+	},
     421:{
         [_source_annotation]:[['\n不穀','\n反：同「返」，歸返。\n不穀']],//缺 反的註釋，依文義補上
     },
