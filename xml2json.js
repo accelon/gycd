@@ -14,7 +14,7 @@ const srcdir='raw/';
 import PUA from './src/pua.js';
 let raw=[];
 const srcfn=process.argv[2]|| 'dict_idioms.xml'
-
+//if (srcfn.indexOf('concised')>0) idfield=2;
 readTextLines('raw/sym.txt').forEach(line=>{
 	const at=line.indexOf(' ');
 	if (at==-1) return;
@@ -27,7 +27,10 @@ let entries=[];
 if (srcfn.endsWith('.xml')) {
 	raw=readTextContent(srcdir+srcfn);
 	const entityfn=srcfn.replace('.xml','-entity.json');
-	const entities=JSON.parse(readTextContent(srcdir+entityfn));
+	let entities={}	
+	if (fs.existsSync(srcdir+entityfn)) {
+		entities=JSON.parse(readTextContent(srcdir+entityfn));
+	}
 	entries=fromExcelXML(raw,entities);
 	entries.shift();//drop field names
 } else throw "only support and xml";
