@@ -24,7 +24,7 @@ const idioms_fields="synonym,antonym,related".split(',');
 
 const ORTH=0,ID=1  /*0 not orth, 1: is orth, 2: has detail allusion*/ ,  SYN=2, ANT=3, REL=4;
 const addIdiom=(str,role, orth)=>{
-	if (!idioms[str]) idioms[str]=[0,'',[],[],[]]; //
+	if (!idioms[str]) idioms[str]=[0,'-1',[],[],[]]; //
 	if (str!==orth)  {
 		//如果相關成語已在 同義或反義，就不必再列了
 		if (role==REL && (idioms[str][SYN].indexOf(orth)>-1 ||
@@ -96,32 +96,32 @@ idiomslexicon.sort(alphabetically0)
 const lemma=idiomslexicon.map(it=>it[0]);
 
 let out=idiomslexicon.map(it=>it[0]+'\t'+it[1]);
-out.unshift('^_<ptk=cyd type=tsv name=lemma preload=true>\torth=number/[012]\toid=unique_number\tsyn=keys\tant=keys\trel=keys');
+out.unshift('^_<ptk=cyd type=tsv name=lemma caption=詞目 preload=true>\torth=number/[012]\toid=unique_number\tsyn=keys\tant=keys\trel=keys');
 writeChanged(outdir+'1-lemma.tsv',out.join('\n'));
 
 const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);
 out=booknames_.sort(alphabetically0).map(it=>it.join('\t'));
-out.unshift('^_<ptk=cyd type=tsv name=booknames preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
-writeChanged(outdir+'2-books.txt',out.join('\n'),true)
+out.unshift('^_<ptk=cyd type=tsv name=booknames caption=書名 preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
+writeChanged(outdir+'2-books.tsv',out.join('\n'),true)
 
 const persons_ = fromObj(persons,(a,b)=>[a,b]);
 out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
-out.unshift('^_<ptk=cyd type=tsv name=persons preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
+out.unshift('^_<ptk=cyd type=tsv name=persons caption=人名 preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
 
 writeChanged(outdir+'3-persons.tsv',out.join('\n'),true)
 
 let maxann=0;
-const annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
+let annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
 	const out=[];
 	if (ann.length>maxann) maxann=ann.length;
 	for (let i=0;i<ann.length;i++) {
 		out.push( [ k , id[i] ,ann[i]  ]);
 	}
 	return out;
-}).flat().map(it=>it.join('\t'));
+}).sort(alphabetically0);
 
-annotationlexicon.sort(alphabetically0)
-annotationlexicon.unshift('^_<ptk=cyd type=tsv name=annotation preload=true>\te=key:lemma\tann=text'); //  出現此人的詞目列表
+annotationlexicon=annotationlexicon.flat().map(it=>it.join('\t'))
+annotationlexicon.unshift('^_<ptk=cyd type=tsv caption=注釋 name=annotation preload=true>\te=key:lemma\tann=text'); //  出現此人的詞目列表
 
 writeChanged(outdir+'4-annotations.tsv',annotationlexicon.join('\n'),true)
 console.log('max ann',maxann)
