@@ -22,15 +22,15 @@ const booknames_fields=toObj("allusion,source_bookname,definition,bookproof".spl
 const idioms_fields="synonym,antonym,related".split(',');
 
 
-const ORTH=0,ID=1  /*0 not orth, 1: is orth, 2: has detail allusion*/ ,  SYN=2, ANT=3, REL=4;
+//const ORTH=0,ID=1  /*0 not orth, 1: is orth, 2: has detail allusion*/ ,  
+const SYN=0, ANT=1, REL=2;
 const addIdiom=(str,role, orth)=>{
-	if (!idioms[str]) idioms[str]=[0,'-1',[],[],[]]; //
-	if (str!==orth)  {
+	if (!idioms[str]) idioms[str]=[[],[],[]]; //
+	if (str!==orth && orth)  {
 		//如果相關成語已在 同義或反義，就不必再列了
 		if (role==REL && (idioms[str][SYN].indexOf(orth)>-1 ||
 				idioms[str][ANT].indexOf(orth)>-1 )) return;
-		
-		if (idioms[str][role].indexOf(orth)==-1) {
+		if (role>=0 && idioms[str][role].indexOf(orth)==-1) {
 			idioms[str][role].push(orth);
 		}
 	}
@@ -46,23 +46,23 @@ content.forEach(entry=>{
 		if (f=='id') cydid=entry[f];
 		else if (f=='orth') {
 			orth=entry[f];
-			addIdiom(orth,ORTH,orth);
-			idioms[orth][ID]=cydid;
-			idioms[orth][ORTH]=2; //有詳細的典故
+			addIdiom(orth);
+			// idioms[orth][ID]=cydid;
+			// idioms[orth][ORTH]=2; //有詳細的典故
 		}
 		else if (f=='definition'||f=='allusion') { 
 			entry[f].replace(/「([＿\u3400-\u9fff\ud800-\udfff，]{3,10})」/g,(m,m1)=>{
 				addIdiom(m1, REL, orth); //定義和語源出現的詞條，也視為 相關 成語
 			});
 			if (f=='allusion' && entry[f][0]=='△') {
-				idioms[orth][ORTH]=1;//典故參見其他成語
+				// idioms[orth][ORTH]=1;//典故參見其他成語
 			}
 		}
 		const role=idioms_fields.indexOf(f);
 
 		if (role>-1) {
 			const out=entry[f].split('、');
-			out.forEach( it=>it&&addIdiom(it, role+2, orth) );
+			out.forEach( it=>it&&addIdiom(it, role, orth) );
 		}
 		if (persons_fields[f]) {
 			const out=extractAuthor( entry[f] );
@@ -96,7 +96,7 @@ idiomslexicon.sort(alphabetically0)
 const lemma=idiomslexicon.map(it=>it[0]);
 
 let out=idiomslexicon.map(it=>it[0]+'\t'+it[1]);
-out.unshift('^_<ptk=cyd type=tsv name=lemma caption=詞目 preload=true>\torth=number/[012]\toid=unique_number\tsyn=keys\tant=keys\trel=keys');
+out.unshift('^_<ptk=cyd type=tsv name=lemma caption=詞目 preload=true>\tsyn=keys\tant=keys\trel=keys');
 writeChanged(outdir+'1-lemma.tsv',out.join('\n'));
 
 const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);

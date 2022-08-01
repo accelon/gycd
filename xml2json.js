@@ -32,6 +32,7 @@ if (srcfn.endsWith('.xml')) {
 		entities=JSON.parse(readTextContent(srcdir+entityfn));
 	}
 	entries=fromExcelXML(raw,entities);
+	console.log(entries.length)
 	entries.shift();//drop field names
 } else throw "only support and xml";
 

@@ -20,8 +20,15 @@ export const fromExcelXML=(content,entities, idfield=0)=>{
 	const cols=parseInt(content.match(/ss:ExpandedColumnCount="(\d+)"/)[1]);
 	content.replace(/<Row[^>]*>(.+?)<\/Row>/g,(m0,rowdata)=>{
 		let cellcount=0;
-		let row=[],id;
-		rowdata.replace(/<Cell[^>]*>(.+?)<\/Cell>/g,(m,m1)=>{
+		let row=[],id, fieldidx=0;
+		rowdata.replace(/<Cell([^>]*)>(.+?)<\/Cell>/g,(m,ssindex,m1)=>{
+			if (ssindex) {
+				const at=ssindex.indexOf('ss:Index');
+				if (at>0) {
+					cellcount=parseInt(ssindex.slice(11))-1;
+				}
+			}
+
 			m1=m1.replace(/<[^>]+>/g,'');
 			if (cellcount==idfield) {
 				//entries.push(row);
@@ -30,8 +37,8 @@ export const fromExcelXML=(content,entities, idfield=0)=>{
 				// }
 				id=m1;
 			} 
-			const cell=replaceEntity(m1,entities,id,cellcount %cols);
-			row.push(cell);	
+			const cell=replaceEntity(m1,entities,id,cellcount %cols)||'';
+			row[cellcount]=cell.trim();
 			cellcount++;
 		});
 		// if (row.length!==cols) {
