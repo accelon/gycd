@@ -5,7 +5,7 @@
 off
 *.txt
 gycd
-jmgycd
+jmd
 *.off
 *.json
 moedict-data

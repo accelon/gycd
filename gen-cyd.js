@@ -57,7 +57,8 @@ content.forEach(entry=>{
 		else if (f=='antonym') ant=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='related') rel=entry[f].replace(/、/g,',').replace(/ /g,'')//.split('、').filter(it=>!!it).map(it=>orthId(it)).join(',');
 		else if (f=='quotes') {
-			source=source_bookname+entry[f].join('');
+			//source=source_bookname+
+			source=entry[f].join('');
 		}
 		else if (f=='source_bookname') {
 			source_bookname=entry[f];
@@ -81,6 +82,7 @@ content.forEach(entry=>{
 			//△「」是多餘的，在synonym 
 
 			let def=entry[f];
+
 			def=def.replace(/△「[＿\u3400-\u9fff\ud800-\udfff，、「」]+/g,'').trim();
 
 			def=def.replace(/「([＿\u3400-\u9fff\ud800-\udfff，]{3,10})」/g,(m,m1)=>{

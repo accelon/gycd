@@ -4,8 +4,8 @@ fromObj,patchBuf,toObj,incObj,codePointLength,replaceZhuyin,
 extractAuthor,extractBook,replaceAuthor,replaceBook}=PTK;
 
 await nodefs;
-const outdir='jmgycd.offtext/';
-const outfile=outdir+'jmgycd.off'
+const outdir='jmd.offtext/';
+const outfile=outdir+'jmd.off'
 const srcdir='tidied/'
 const srcfile=srcdir+'dict_concised.json'
 const content=JSON.parse(readTextContent(srcfile));
@@ -44,14 +44,14 @@ const enumLemma=()=>{
 enumLemma();
 const Lemma=fromObj(LemmaRef,(a,b)=>a+'\t'+ b.join(','));
 Lemma.sort(alphabetically);
-Lemma.unshift('^_<ptk=jmgycd type=tsv name=lemma caption=詞目 preload=true>\trel=keys')
+Lemma.unshift('^_<ptk=jmd type=tsv name=lemma caption=詞目 preload=true>\trel=keys')
 
 writeChanged(outdir+'1-lemma.tsv',Lemma.join('\n'),true);
 Lemma.shift();//drop first line for a searchable lexicon
 
 const LemmaPhony={};
 const buildOfftext=()=>{
-	const header=`^_<ptk=jmgycd zh=簡明國語詞典 chunktag=e>
+	const header=`^_<ptk=jmd zh=簡明典 chunktag=e>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma>
 ^:pron<caption=讀音>
 ^:eg
