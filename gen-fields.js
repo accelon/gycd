@@ -101,14 +101,14 @@ writeChanged(outdir+'1-lemma.tsv',out.join('\n'));
 
 const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);
 out=booknames_.sort(alphabetically0).map(it=>it.join('\t'));
-out.unshift('^_<ptk=cyd type=tsv name=booknames caption=書名 preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
-writeChanged(outdir+'2-books.tsv',out.join('\n'),true)
+out.unshift('^_<ptk=cyd type=tsv name=book caption=書名 preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
+writeChanged(outdir+'2-book.tsv',out.join('\n'),true)
 
 const persons_ = fromObj(persons,(a,b)=>[a,b]);
 out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
-out.unshift('^_<ptk=cyd type=tsv name=persons caption=人名 preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
+out.unshift('^_<ptk=cyd type=tsv name=person caption=人名 preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
 
-writeChanged(outdir+'3-persons.tsv',out.join('\n'),true)
+writeChanged(outdir+'3-person.tsv',out.join('\n'),true)
 
 let maxann=0;
 let annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
@@ -123,5 +123,5 @@ let annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
 annotationlexicon=annotationlexicon.flat().map(it=>it.join('\t'))
 annotationlexicon.unshift('^_<ptk=cyd type=tsv caption=注釋 name=annotation preload=true>\te=key:lemma\tann=text'); //  出現此人的詞目列表
 
-writeChanged(outdir+'4-annotations.tsv',annotationlexicon.join('\n'),true)
+writeChanged(outdir+'4-annotation.tsv',annotationlexicon.join('\n'),true)
 console.log('max ann',maxann)

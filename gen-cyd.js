@@ -11,18 +11,19 @@ const content=JSON.parse(readTextContent(srcfile));
 
 const Lemma=readTextLines('cyd.offtext/1-lemma.tsv'); //是詞目及非詞目的熟語
 Lemma.shift();
-const Books=readTextLines('cyd.offtext/2-books.tsv'); 
+const Books=readTextLines('cyd.offtext/2-book.tsv'); 
 Books.shift();
-const Persons=readTextLines('cyd.offtext/3-persons.tsv'); 
+const Persons=readTextLines('cyd.offtext/3-person.tsv'); 
 Persons.shift();
-const Annotations=readTextLines('cyd.offtext/4-annotations.tsv'); 
+const Annotations=readTextLines('cyd.offtext/4-annotation.tsv'); 
 Annotations.shift();
 
 const out=`^_<ptk=cyd zh=成語典 chunktag=e>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
 ^:def<caption=釋文>
-^:ti
-^:au
+^:ti<type=key:book key=ref>
+^:au<type=key:person key=ref>
+^:lbl
 ^:f<type=note:annotation key=e text=ann>
 ^:cf`.split(/\r?\n/)
 
@@ -49,6 +50,17 @@ const doQuotes=(source, orth)=>{ //將annotation 的名相解釋填入source (�
 		return '^f'+(m2||''); //search 4-annotations key and entry id
 	});
 }
+const  markAuthorBook=s=>{
+	s=replaceAuthor(s,(prefix,str,suffix)=>{
+		const auid=authorId(str);
+		return prefix+(auid?'^au~'+codePointLength(str)+str:str)+suffix;
+	})
+	s=replaceBook(s,(prefix,str,suffix)=>{
+		const bkid=bookId(str);
+		return (bkid?'^ti'+prefix+str:str)+suffix;
+	})	
+	return s;
+}
 content.forEach(entry=>{
 	let quotes,source,source_bookname;
 	for (let f in entry) {
@@ -64,7 +76,13 @@ content.forEach(entry=>{
 			source_bookname=entry[f];
 		}
 		else if (f=='annotation'){ //annotation in 4-annotation.tsv
-			out.push('典故：'+doQuotes(source, orth));
+			out.push('^lbl〔出處〕',doQuotes(source, orth));
+		}
+		else if (f=='allusion') {
+			entry[f]&&out.push('^lbl〔典故〕',markAuthorBook(entry[f]));
+		}
+		else if (f=='bookproof') {
+			entry[f]&&out.push('^lbl〔書證〕', ...entry[f].map(markAuthorBook));
 		}
 		else if (f=='definition') {
 			/* use indexOf 1-lemma.off as id */
@@ -89,15 +107,7 @@ content.forEach(entry=>{
 			 	const sid=orthId(m1);
 			 	return '^cf'+sid+'「'+m1+'」';
 			});
-
-			def=replaceAuthor(def,(prefix,str,suffix)=>{
-				const auid=authorId(str);
-				return prefix+(auid?'^au~'+codePointLength(str)+str:str)+suffix;
-			})
-			def=replaceBook(def,(prefix,str,suffix)=>{
-				const bkid=bookId(str);
-				return (bkid?'^ti'+prefix+str:str)+suffix;
-			})			
+			def=markAuthorBook(def);
 
 			out.push(def.replace(/\n+/g,'\n')); //remove inner blank lines
 		}
