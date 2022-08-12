@@ -96,17 +96,20 @@ idiomslexicon.sort(alphabetically0)
 const lemma=idiomslexicon.map(it=>it[0]);
 
 let out=idiomslexicon.map(it=>it[0]+'\t'+it[1]);
-out.unshift('^_<ptk=cyd type=tsv name=lemma caption=詞目 preload=true>\tsyn=keys\tant=keys\trel=keys');
+//tagname 讓 條目連到 ^e
+out.unshift('^_<ptk=cyd type=tsv name=lemma tagname=e caption=詞目 preload=true>\tsyn=keys\tant=keys\trel=keys');
 writeChanged(outdir+'1-lemma.tsv',out.join('\n'));
 
 const booknames_ = fromObj(booknames,(a,b)=>[a,b.join(',')]);
 out=booknames_.sort(alphabetically0).map(it=>it.join('\t'));
-out.unshift('^_<ptk=cyd type=tsv name=book caption=書名 preload=true>\tref=keys:lemma'); //  出現此書的詞目列表
+
+//　逆連到 e , 以 lemma 為key
+out.unshift('^_<ptk=cyd type=tsv name=book caption=書名 preload=true>\te=keys:lemma'); //  出現此書的詞目列表
 writeChanged(outdir+'2-book.tsv',out.join('\n'),true)
 
 const persons_ = fromObj(persons,(a,b)=>[a,b]);
 out=persons_.sort(alphabetically0).map(it=>it.join('\t'))
-out.unshift('^_<ptk=cyd type=tsv name=person caption=人名 preload=true>\tref=keys:lemma'); //  出現此人的詞目列表
+out.unshift('^_<ptk=cyd type=tsv name=person caption=人名 preload=true>\te=keys:lemma'); //  出現此人的詞目列表
 
 writeChanged(outdir+'3-person.tsv',out.join('\n'),true)
 

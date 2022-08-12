@@ -18,7 +18,7 @@ Persons.shift();
 const Annotations=readTextLines('cyd.offtext/4-annotation.tsv'); 
 Annotations.shift();
 
-const out=`^_<ptk=cyd zh=成語典 chunktag=e>
+const out=`^_<ptk=cyd zh=成語典 name=maincaption=正文 chunktag=e>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
 ^:def<caption=釋文>
 ^:ti<type=key:book key=ref>
