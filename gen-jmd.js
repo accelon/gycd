@@ -5,7 +5,7 @@ extractAuthor,extractBook,replaceAuthor,replaceBook}=PTK;
 
 await nodefs;
 const outdir='jmd.offtext/';
-const outfile=outdir+'jmd.off'
+const outfile=outdir+'2-jmd.off'
 const srcdir='tidied/'
 const srcfile=srcdir+'dict_concised.json'
 const content=JSON.parse(readTextContent(srcfile));
@@ -51,7 +51,7 @@ Lemma.shift();//drop first line for a searchable lexicon
 
 const LemmaPhony={};
 const buildOfftext=()=>{
-	const header=`^_<ptk=jmd zh=簡明典 chunktag=e>
+	const header=`^_<ptk=jmd zh=簡明典 chunktag=e name=main caption=正文>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma>
 ^:pron<caption=讀音>
 ^:eg

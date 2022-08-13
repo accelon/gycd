@@ -4,7 +4,7 @@ fromObj,patchBuf,toObj,incObj,codePointLength,replaceZhuyin,
 extractAuthor,extractBook,replaceAuthor,replaceBook}=PTK;
 
 await nodefs;
-const outfile='cyd.offtext/cyd.off'
+const outfile='cyd.offtext/4-cyd.off'
 const srcdir='tidied/'
 const srcfile=srcdir+'dict_idioms.json'
 const content=JSON.parse(readTextContent(srcfile));

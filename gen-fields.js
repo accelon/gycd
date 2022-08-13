@@ -126,5 +126,5 @@ let annotationlexicon=fromObj(annotations,(k,[ann,id] )=>{
 annotationlexicon=annotationlexicon.flat().map(it=>it.join('\t'))
 annotationlexicon.unshift('^_<ptk=cyd type=tsv caption=注釋 name=annotation preload=true>\te=key:lemma\tann=text'); //  出現此人的詞目列表
 
-writeChanged(outdir+'4-annotation.tsv',annotationlexicon.join('\n'),true)
+writeChanged(outdir+'5-annotation.tsv',annotationlexicon.join('\n'),true)
 console.log('max ann',maxann)
