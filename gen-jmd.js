@@ -44,7 +44,7 @@ const enumLemma=()=>{
 enumLemma();
 const Lemma=fromObj(LemmaRef,(a,b)=>a+'\t'+ b.join(','));
 Lemma.sort(alphabetically);
-Lemma.unshift('^_<ptk=jmd type=tsv name=lemma caption=詞目 preload=true>\trel=keys')
+Lemma.unshift('^_<ptk=jmd type=tsv name=lemma caption=詞目 tagname=e preload=true>\trel=keys')
 
 writeChanged(outdir+'1-lemma.tsv',Lemma.join('\n'),true);
 Lemma.shift();//drop first line for a searchable lexicon

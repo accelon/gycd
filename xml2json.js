@@ -32,8 +32,7 @@ if (srcfn.endsWith('.xml')) {
 		entities=JSON.parse(readTextContent(srcdir+entityfn));
 	}
 	entries=fromExcelXML(raw,entities);
-	console.log(entries.length)
-	entries.shift();//drop field names
+	console.log(entries.shift())
 } else throw "only support and xml";
 
 
@@ -65,9 +64,12 @@ const tidy=buf=>{
 entries.shift();
 const entry_id={};
 entries.forEach(entry=>{
-	const [id,idiom]=entry;
+	let [id,f1,f2,idiom]=entry;
+	if (entry.length<16||entry.length>20) { 
+		idiom=entry[1];
+	}
 	if (entry_id[idiom] && id!=='354') { // 含沙射影 duplicated 8 and 354
-		console.log('duplicated idiom',id,idiom, entry_id[idiom]);
+		console.log('duplicated id',id,idiom, entry_id[idiom]);
 	} else {
 		entry_id[idiom]=id;
 	}

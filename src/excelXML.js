@@ -6,7 +6,7 @@ const replaceEntity=(str,entities,rowid,ncell)=>{
 	str=str.replace(/&([^;]+);/g,(m,m1)=>{
 		const repl=entities[m1]
 		if (!repl) {
-			console.log(rowid,ncell,'unknow entity',m1)	
+			console.log(rowid,ncell,'unknown entity',m1)	
 			return m1;
 		} else {
 			return repl;

@@ -15,17 +15,17 @@ const Books=readTextLines('cyd.offtext/2-book.tsv');
 Books.shift();
 const Persons=readTextLines('cyd.offtext/3-person.tsv'); 
 Persons.shift();
-const Annotations=readTextLines('cyd.offtext/4-annotation.tsv'); 
+const Annotations=readTextLines('cyd.offtext/5-annotation.tsv'); 
 Annotations.shift();
 
-const out=`^_<ptk=cyd zh=成語典 name=maincaption=正文 chunktag=e>
+const out=`^_<ptk=cyd zh=成語典 name=main caption=正文 chunktag=e>
 ^:e<caption=詞目 preload=true id=unique_number syn=keys:lemma ant=keys:lemma rel=keys:lemma>
 ^:def<caption=釋文>
-^:ti<type=key:book key=ref>
-^:au<type=key:person key=ref>
+^:ti<type=key:book field=ref>
+^:au<type=key:person field=ref>
 ^:lbl
-^:f<type=note:annotation key=e text=ann>
-^:cf`.split(/\r?\n/)
+^:f<type=note:annotation field=e text=ann>
+^:cf<type=confer:e>`.split(/\r?\n/)
 
 const orthId=str=>{
 	const at=bsearch(Lemma,str);
@@ -105,7 +105,11 @@ content.forEach(entry=>{
 
 			def=def.replace(/「([＿\u3400-\u9fff\ud800-\udfff，]{3,10})」/g,(m,m1)=>{
 			 	const sid=orthId(m1);
-			 	return '^cf'+sid+'「'+m1+'」';
+			 	if (sid!==id) {
+			 		return '^cf'+sid+'「'+m1+'」';
+			 	} else {
+			 		return '「'+m1+'」';
+			 	}
 			});
 			def=markAuthorBook(def);
 
